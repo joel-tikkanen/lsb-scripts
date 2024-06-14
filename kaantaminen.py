@@ -5,7 +5,10 @@ from PIL import Image
 import os
 
 # Ensure TESSDATA_PREFIX is set correctly
-os.environ['TESSDATA_PREFIX'] = 'testdata'  # Replace with the actual path to tessdata
+os.environ['TESSDATA_PREFIX'] = r'Z:\lsb-scripts\testdata'
+
+# Set the correct path to the Tesseract executable
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\joeltik\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 
 def get_image_orientation(image_path):
     image = Image.open(image_path)
@@ -34,8 +37,8 @@ def correct_image_orientation(image_path, output_path, rotation):
     print(f"Image saved correctly oriented: {output_path}")
 
 # Directory containing the scanned images
-input_directory = "/Users/joeltikkanen/Downloads/lsbfi_1978-2_2024-06-12_0930/1978-2"
-output_directory = "kaanto_output"
+input_directory = r'C:\Users\joeltik\Downloads\1978-2'
+output_directory = r'kaanto_output'
 
 # Create output directory if it does not exist
 if not os.path.exists(output_directory):

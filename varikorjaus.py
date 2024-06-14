@@ -22,13 +22,16 @@ def correct_colors(image_path, output_path, new_white_point=(254, 254, 254), mar
     # Get image dimensions
     height, width, _ = image_rgb.shape
 
-    # Find the darkest point in the central part of the image (excluding margins)
+    # Find the darkest point in the central part of the image (excluding margins), but ignore absolute black
     reshaped_image = image_rgb[margin:height-margin, margin:width-margin].reshape((-1, 3))
-    darkest_point = np.min(reshaped_image, axis=0).astype(np.float32)
+    valid_dark_pixels = reshaped_image[np.any(reshaped_image > [0, 0, 0], axis=1)]
+    if valid_dark_pixels.size == 0:
+        raise ValueError("No valid dark pixels found that are not absolute black.")
+    darkest_point = np.min(valid_dark_pixels, axis=0).astype(np.float32)
 
     # Find the lightest point in the specified margins, excluding near-white pixels
     margin_pixels = image_rgb[margin:height-margin, margin:width-margin].reshape(-1, 3)
-    valid_pixels = margin_pixels[np.all(margin_pixels < [247, 220, 185], axis=1)]
+    valid_pixels = margin_pixels[np.all(margin_pixels < [247, 245, 200],axis=1)]
     if valid_pixels.size == 0:
         raise ValueError("No valid pixels found that are not near-white.")
     lightest_point = np.max(valid_pixels, axis=0).astype(np.float32)
@@ -67,6 +70,6 @@ def process_images(input_folder, output_folder):
             except Exception as e:
                 print(f'Error processing {input_image_path}: {e}')
 
-input_folder = '/Users/joeltikkanen/Documents/lsb/kaanto_output'
-output_folder = '/Users/joeltikkanen/Documents/lsb/output'
+input_folder = r'Z:\lsb-scripts\kaanto_output'
+output_folder = r'Z:\lsb-scripts\output'
 process_images(input_folder, output_folder)
