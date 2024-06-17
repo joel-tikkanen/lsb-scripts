@@ -1,4 +1,3 @@
-// Function to run Photoshop actions on a folder of images
 function runPhotoshopActions(inputFolder, actions) {
     if (inputFolder != null) {
         var fileList = inputFolder.getFiles(/\.(jpg|jpeg|tif|tiff|psd|png)$/i); // Adjust file extensions as needed
@@ -15,7 +14,11 @@ function runPhotoshopActions(inputFolder, actions) {
                     // Run each action in the actions array
                     for (var j = 0; j < actions.length; j++) {
                         var action = actions[j];
-                        app.doAction(action.actionName, action.actionSet);
+                        try {
+                            app.doAction(action.actionName, action.actionSet);
+                        } catch (e) {
+                            alert("Error playing action: " + action.actionName + " from set: " + action.actionSet + "\n" + e);
+                        }
                     }
 
                     // Save the file (overwrite existing file)
@@ -35,29 +38,28 @@ function runPhotoshopActions(inputFolder, actions) {
     }
 }
 
-// Function to execute a batch file that runs Python scripts
-function runPythonScriptBatch(batchFilePath) {
-    var cmdFile = new File(batchFilePath);
-    cmdFile.execute();
+// Function to execute a shell script that runs Python scripts
+function runPythonScriptShell(shellFilePath) {
+    try {
+        var result = app.system(shellFilePath);
+        alert("Shell script executed: " + result);
+    } catch (e) {
+        alert("Error executing shell script: " + e);
+    }
 }
 
 // Run the workflow function
 function runWorkflow() {
     // Specify the folders and actions
-    var inputFolder = Folder.selectDialog("Select the folder with images to process");
-    var outputFolder = new Folder("Z:/lsb-scripts/output"); // Adjust output folder as needed
-
-    // Run Python script batch file
-    var pythonBatchFilePath = "Z:/lsb-scripts/run_python_script.bat";
-    runPythonScriptBatch(pythonBatchFilePath);
+    var outputFolder = new Folder("/Users/joeltikkanen/Documents/lsb/output"); // Adjust output folder as needed
 
     // Define the Photoshop actions to run after Python scripts
     var photoshopActions1 = [
-        { actionSet: "AATK 4-väri", actionName: "1a" }  // First Photoshop action set after kaantaminen.py
+        { actionSet: "AATK", actionName: "1a" }  // First Photoshop action set after kaantaminen.py
     ];
 
     var photoshopActions2 = [
-        { actionSet: "AATK 4-väri", actionName: "2" }  // Second Photoshop action set after varikorjaus.py
+        { actionSet: "AATK", actionName: "2" }  // Second Photoshop action set after varikorjaus.py
     ];
 
     // Run Photoshop actions on processed images
